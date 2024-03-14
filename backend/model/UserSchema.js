@@ -15,5 +15,5 @@ const userSchema = new Schema({
     workTime: {type: String, require: true}
 })
 
-const User = model('User', userSchema);
+const User = model('user', userSchema);
 module.exports = User;
