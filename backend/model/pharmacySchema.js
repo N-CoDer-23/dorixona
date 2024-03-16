@@ -16,11 +16,15 @@ const pharmacySchema = new Schema({
     price:{
         type: Number,
         require: true
-     },
-     image:{
+    },
+    image:{
         type: String,
         require: true
-     }
+    },
+    type: {
+        type: String,
+        require: true
+    }
 
 })
 
