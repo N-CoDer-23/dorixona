@@ -2,96 +2,96 @@ const User = require('../model/UserSchema');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const getLogin = (req, res) => {
-    const allUserInfo = req.body;
-    res.send(allUserInfo)
-
+const getUser = (req, res) => {
+    const allInfo = req.body;
+    res.send(allInfo)
 }
-// ----------------Login-SignIn-------------------
-const Login = async (req, res) => {
-    try {
-
+// -------Login - Sigin in-------------
+const Login = async(req, res) => {
+    try{
         const { username, password } = req.body;
         const user = await User.findOne({ username, password });
-        if (!user) {
+
+        if (!user){
             return res.status(401).send({
                 success: false,
-                message: "Username yoki Password noto'g'ri!"
+                message: "Username or Password involid!"
             })
         }
-        if (await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ username: user.username }, "secret")
+
+        if (await bcrypt.compare(password, user.password)){
+            const token = jwt.sign({username: user.username}, "Secret")
             return res.status(200).send({
                 success: true,
-                message:` Xush kebsiz ${username}`,
+                message: `Welcome back ${username}`,
                 token: token
             })
         }
         else {
             res.status(401).send({
                 success: false,
-                message: "Username yoki Password noto'g'ri!"
+                message: "Username or Password involid!"
             })
         }
-    } catch (error) {
+    }catch(error){
         console.error(error);
         res.status(500).send({
-            succes: false,
-            message: "Serverda xato"
+            success: false,
+            message: "Server error"
         })
     }
 }
 
-// ----------------Register-SignUp-------------------
+// -----Register - SiginUp-------
 const Register = async (req, res) => {
-    try {
-        const { username, password } = req.body;
+    try{
+        const {username, password} = req.body;
         const existingUser = await User.find({ username });
-        const hashedPassword = await bcrypt.hash(password, 15)
+        const hashedPassword = await bcrypt.hash(password, 15);
 
         if (existingUser) {
             res.status(400).send({
                 success: false,
-                message: "Username chiqib ketdi!"
+                message: "Username already exists!"
             })
-        } else {
-            let allUserInfo = req.body;
-            const newUser = new User({ allUserInfo, hashedPassword });
+        }
+        else {
+            let allInfo = req.body;
+            const newUser = new User({allInfo, hashedPassword});
             await newUser.save();
             res.status(201).send({
                 success: true,
-                message: "Muaffiyaqatli registratsiya bo'ldi !"
+                message: "Registration successful!"
             })
         }
-    } catch (error) {
+    }catch (error) {
         console.error(error);
         res.status(500).send({
-            succes: false,
-            message: "Serverda xato"
+            success: false,
+            message: "Server error"
         })
     }
 }
-
-// ----------------Delete Login--------------------
-const deleteLogin = async (req, res) => {
-    try {
-        let { _id } = req.body;
+// ---------Delete - User---------
+const deleteUser = async (req, res) => {
+    try{
+        let {_id} =req.body;
         let deleted = await User.findByIdAndDelete(_id);
 
         if (!deleted) {
-            return res.send({
+            return req.send({
                 success: false,
-                message: "User o'chirildi!",
-                innerData: deleted
+                message: "User deleted!",
+                token: deleted
             })
         }
-    } catch (error) {
-        res.send({ success: false, message: error })
+    }catch (error) {
+        res.send({ success: false, message: error})
     }
 }
-// ----------------Update Login--------------------
-const updateLogin = async (req, res) => {
-    try {
+// ------Update User-----------
+const updateUser = async (req, res) => {
+    try{
         let { id } = req.body;
         let body = req.body;
         let editUser = await User.updateMany({ _id: id }, body);
@@ -99,15 +99,16 @@ const updateLogin = async (req, res) => {
         if (!editUser) {
             return res.send({
                 success: false,
-                message: "User yangilanmadi",
-                innerData: editUser
+                message: "User is not updated!",
+                token: editUser
             })
         }
         res.send({
             success: true,
-            message: "User yangilandi !",
-            innerData: editUser
+            message: "User is updated!",
+            token: editUser
         });
+
     } catch (error) {
         res.send({ success: false, message: error })
     }
@@ -115,9 +116,10 @@ const updateLogin = async (req, res) => {
 
 
 module.exports = {
-    getLogin,
+    getUser,
     Login,
     Register,
-    deleteLogin,
-    updateLogin
+    deleteUser,
+    updateUser
+
 }
